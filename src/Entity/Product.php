@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Product
 {
+
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -31,11 +33,13 @@ class Product
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $photo_filepath;
+    private $image_filepath;
     /**
      * @ORM\Column(type="string", length=500, nullable=true)
      */
     private $description;
+
+
 
     /**
      * @return mixed
@@ -79,21 +83,6 @@ class Product
         $this->price = $price;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPhotoFilepath()
-    {
-        return $this->photo_filepath;
-    }
-
-    /**
-     * @param mixed $photo_filepath
-     */
-    public function setPhotoFilepath($photo_filepath): void
-    {
-        $this->photo_filepath = $photo_filepath;
-    }
 
     /**
      * @return mixed
@@ -109,6 +98,22 @@ class Product
     public function setDescription($description): void
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getimage_filepath()
+    {
+        return $this->image_filepath;
+    }
+
+    /**
+     * @param mixed $image_filepath
+     */
+    public function setImageFilepath($image_filepath): void
+    {
+        $this->image_filepath = $image_filepath;
     }
 
 

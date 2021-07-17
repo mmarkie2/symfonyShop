@@ -23,7 +23,7 @@ public function load(ObjectManager $manager)
 
     $user->setEmail("test@test.pl");
            $user->setPassword($this->passwordHasher->hashPassword(
-               $user,'the_new_password'
+               $user,'test'
                ));
     $user->setRoles(['ROLE_USER']);
     $manager->persist($user);

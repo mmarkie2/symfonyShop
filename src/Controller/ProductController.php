@@ -3,19 +3,26 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Service\FileUploader;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Form\ProductType;
+
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
+
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 
-/**
- * @Route("/product")
- */
 class ProductController extends AbstractController
 {
 
     /**
-     * @Route("", name="product_index")
+     * @Route("/product", name="product_index")
      */
     public function index(): Response
     {
@@ -30,26 +37,37 @@ class ProductController extends AbstractController
     }
 
 
-
     /**
-     * @Route("/create", name="product_create")
+     * @Route("/product/create", name="product_create")
+     * @param Request $request
+     * @param FileUploader $fileUploader
+     * @param EntityManagerInterface $entityManager
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function create(): Response
+    public function create(Request $request, FileUploader $fileUploader, EntityManagerInterface  $entityManager) : Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
-
         $product = new Product();
-        $product->setName('Keyboard');
-        $product->setPrice(1999);
-        $product->setDescription('Ergonomic and stylish!');
+        $form = $this->createForm(ProductType::class, $product);
+        $form->handleRequest($request);
 
-        // tell Doctrine you want to (eventually) save the Product (no queries yet)
-        $entityManager->persist($product);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $file */
+            $file = $form->get('image')->getData();
+            if ($file) {
+                $filepath = $fileUploader->upload($file);
+                $product->setImageFilepath($filepath );
+            }
 
-        // actually executes the queries (i.e. the INSERT query)
-        $entityManager->flush();
+             $entityManager->persist( $product);
+             $entityManager->flush();
 
-        return new Response('Saved new product with id '.$product->getId());
+
+            return $this->redirectToRoute('product_create');
+        }
+
+        return $this->render('product/create.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
 //    /**
